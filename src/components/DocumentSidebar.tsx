@@ -40,7 +40,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
 useEffect(() => {
   const fetchDocs = async () => {
     try {
-      const res = await fetch("http://localhost:1234/api/active-docs");
+      const res = await fetch("http://3.111.55.107:1234/api/active-docs");
       if (!res.ok) throw new Error("Failed to fetch documents");
 
       const data = await res.json(); // { rooms: [{ roomId, meta }] }
@@ -79,7 +79,7 @@ useEffect(() => {
     );
   };
 const createDoc = () => {
-  fetch("http://localhost:1234/api/create-doc", {
+  fetch("http://3.111.55.107:1234/api/create-doc", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -161,7 +161,7 @@ const createDoc = () => {
                       defaultValue={doc.title}
                       className="bg-transparent border-none outline-none focus:ring-0 w-full truncate text-foreground placeholder:text-muted-foreground"
                         onChange={(e) => {
-                          fetch('http://localhost:1234/api/update-doc', {
+                          fetch('http://3.111.55.107:1234/api/update-doc', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ roomId: doc.id, title: e.target.value })

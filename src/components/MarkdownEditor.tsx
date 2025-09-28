@@ -22,7 +22,7 @@ export const MarkdownEditor = () => {
   const wsProvider = useMemo(() => {
     console.log("Connecting to WebSocket with room:", roomId);
     const wsp = new WebsocketProvider(
-      "ws://localhost:1234",
+      "ws://3.111.55.107:1234",
       roomId,
       doc
     );
