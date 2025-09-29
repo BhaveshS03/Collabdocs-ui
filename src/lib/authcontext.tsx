@@ -10,7 +10,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-axios.defaults.baseURL = "https://15.207.221.31:1234";
+axios.defaults.baseURL = "http://ec2-15-207-221-31.ap-south-1.compute.amazonaws.com:1234";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

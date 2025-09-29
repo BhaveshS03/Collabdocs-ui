@@ -20,7 +20,7 @@ const Editor = () => {
       if (!token) {
         throw new Error("No token found");
       }
-      await fetch("https://15.207.221.31:1234/api/profile", {
+      await fetch("http://ec2-15-207-221-31.ap-south-1.compute.amazonaws.com:1234/api/profile", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
