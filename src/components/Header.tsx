@@ -1,16 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Share2, Download, Settings, Menu } from "lucide-react";
+import { Share2, Download, Settings, Menu, LogOut } from "lucide-react";
 import TitleInput from "./titleip";
 import { useAppContext } from "@/lib/appcontext";
 interface HeaderProps {
   onMenuClick?: () => void;
   showMenuButton?: boolean;
 }
-
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/authcontext";
+import { ShareDocument } from "./addDoc";
 
 export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
-const { currentDocument:doc } = useAppContext();
+  const { currentDocument:doc } = useAppContext();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   return (
     <header className="h-16 border-b border-border bg-gradient-subtle px-6 flex items-center justify-between">
       {/* Left: Menu button (mobile), Logo and document title */}
@@ -45,18 +50,11 @@ const { currentDocument:doc } = useAppContext();
 
       {/* Right: Actions and user */}
       <div className="flex items-center gap-1 sm:gap-3">
-        <Button variant="ghost" size="sm" className="hidden md:flex">
-          <Download className="w-4 h-4 mr-2" />
-          <span className="hidden lg:inline">Export</span>
-        </Button>
         
-        <Button variant="ghost" size="sm" className="hidden sm:flex">
-          <Share2 className="w-4 h-4 mr-2" />
-          <span className="hidden lg:inline">Share</span>
-        </Button>
+        <ShareDocument />
         
-        <Button variant="ghost" size="sm" className="p-2">
-          <Settings className="w-4 h-4" />
+        <Button variant="ghost" size="sm" className="p-2" onClick={logout}>
+          <LogOut className="w-4 h-4"/>
         </Button>
 
         <div className="h-6 w-px bg-border mx-2 hidden sm:block" />

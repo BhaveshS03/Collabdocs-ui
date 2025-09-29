@@ -21,8 +21,11 @@ export const MarkdownEditor = () => {
   const doc = useMemo(() => new Doc(), [roomId]);
   const wsProvider = useMemo(() => {
     console.log("Connecting to WebSocket with room:", roomId);
+    if (!roomId) {
+      return;
+    }
     const wsp = new WebsocketProvider(
-      "ws://3.111.55.107:1234",
+      "ws://localhost:1234",
       roomId,
       doc
     );
@@ -64,6 +67,8 @@ export const MarkdownEditor = () => {
   // Bind collab when editor is created
   useEffect(() => {
     if (!crepe) return;
+    if (!wsProvider) return;
+    const userName = localStorage.getItem("userName") || "Anonymous";
     if (crepe.editor.status === "Created") {
       crepe.editor.action((ctx) => {
         const collabService = ctx.get(collabServiceCtx);
@@ -73,7 +78,16 @@ export const MarkdownEditor = () => {
           .connect();
        
       });
+      wsProvider.awareness.setLocalStateField("user", {
+        name: userName,
+        avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=" + userName
+      });
+
        console.log("[CLIENT] Collab service bound to shared doc");
+
+    return () => {
+      wsProvider.awareness.setLocalState({});
+    };
     }
   }, [crepe, doc, wsProvider]);
 
@@ -86,10 +100,16 @@ export const MarkdownEditor = () => {
             isEditing ? 'ring-2 ring-primary/20' : ''
           }`}
         >
+      {!roomId ? (
+        <div className="text-center text-muted-foreground">
+          Please select or create a document.
+        </div>
+      ) : (
         <Milkdown />
-          
-          {/* Collaboration cursors placeholder */}
-          {/* <div className="absolute top-16 left-16 collab-cursor bg-blue-500" style={{ display: 'none' }}>
+      )}
+                
+        {/* Collaboration cursors placeholder */}
+          {/* <div className="absolute top-16 left-16 collab-cursor bg-blue-500">
             <div className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
               Alex is editing
             </div>

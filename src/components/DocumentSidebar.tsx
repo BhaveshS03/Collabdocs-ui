@@ -3,7 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAppContext } from "@/lib/appcontext";
-import { useEffect } from "react";
+import { useAuth } from "@/lib/authcontext";
+import { useEffect, useState } from "react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,13 +22,16 @@ import {
   Share2,
   Download
 } from "lucide-react";
-import { useState } from "react";
 
 interface Document {
   id: string;
   title: string;
   lastModified: string;
   starred: boolean;
+  owner?: string | null;
+  sharedWith?: string[];
+  createdAt?: string;
+
 }
 
 interface DocumentSidebarProps {
@@ -37,37 +42,55 @@ interface DocumentSidebarProps {
 
 export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarProps) {
   const { documents, setDocuments, currentDocument, setDocument } = useAppContext();
-useEffect(() => {
-  const fetchDocs = async () => {
-    try {
-      const res = await fetch("http://3.111.55.107:1234/api/active-docs");
-      if (!res.ok) throw new Error("Failed to fetch documents");
+  const { profile } = useAuth();
+  //   const fetchDocs = async () => {
+  //     try {
+  //       const res = await fetch("http://3.111.55.107:1234/api/active-docs");
+  //       if (!res.ok) throw new Error("Failed to fetch documents");
 
-      const data = await res.json(); // { rooms: [{ roomId, meta }] }
+  //       const data = await res.json(); // { rooms: [{ roomId, meta }] }
 
-      const docs: Document[] = data.rooms
-        .filter((room: { roomId: string; meta?: any })  => room.roomId!=="undefined"  && room.meta && room.meta.owner !== "Bhaves") // ✅ skip if no meta
-        .map((room: { roomId: string; meta: any }) => ({
-          id: room.roomId,
-          title: room.meta.title || "Untitled",
-          createdAt: room.meta.createdAt || "",
-          lastModified: room.meta.lastModified || "",
-          owner: room.meta.owner || null,
-          currentUser: room.meta.current_user || null,
-          starred: room.meta.starred || false,
-        }));
+  //       const docs: Document[] = data.rooms
+  //         .filter((room: { roomId: string; meta?: any })  => room.roomId!=="undefined"  && room.meta && room.meta.owner !== "Bhaves") // ✅ skip if no meta
+  //         .map((room: { roomId: string; meta: any }) => ({
+  //           id: room.roomId,
+  //           title: room.meta.title || "Untitled",
+  //           createdAt: room.meta.createdAt || "",
+  //           lastModified: room.meta.lastModified || "",
+  //           owner: room.meta.owner || null,
+  //           currentUser: room.meta.current_user || null,
+  //           starred: room.meta.starred || false,
+  //         }));
 
-      console.log("Fetched documents:", docs);
-      setDocuments(docs);
-    } catch (err) {
-      console.error("Error fetching documents:", err);
-    }
-  };
+  //       console.log("Fetched documents:", docs);
+  //       setDocuments(docs);
+  //     } catch (err) {
+  //       console.error("Error fetching documents:", err);
+  //     }
+  //   };
 
-  fetchDocs();
-}, []);
+  //   fetchDocs();
+  // }, []);
+  useEffect(() => {
+    const fetchMyDocs = async () => {
+      try {
+        const res = await fetch("http://localhost:1234/api/my-docs", {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await res.json();
+        console.log(data)
+        if (!data.ok) throw new Error("Failed to fetch documents");
 
+        setDocuments(data.documents);
+      } catch (err) {
+        console.error("Error fetching user documents:", err);
+      }
+    };
 
+    fetchMyDocs();
+  }, []);
 
   const toggleStar = (documentId: string) => {
     setDocuments(
@@ -78,42 +101,74 @@ useEffect(() => {
       )
     );
   };
-const createDoc = () => {
-  fetch("http://3.111.55.107:1234/api/create-doc", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title: "Untitled Document",
-      currentUser: { id: "user-123", name: "Bhavesh" },
-      owner: null, // optional
-    }),
-  })
-    .then(res => res.json())
-    .then(data => {
+  const createDoc = async () => {
+    try {
+      const token = localStorage.getItem("token"); // get JWT
+      if (!token) throw new Error("User not authenticated");
+
+      const res = await fetch("http://localhost:1234/api/create-doc", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // ✅ pass token
+        },
+        body: JSON.stringify({
+          title: "Untitled Document",
+        }),
+      });
+
+      const data = await res.json();
+      console.log("Create document response:", data);
+      if (!data.ok) throw new Error("Failed to create document");
+
       const newDoc: Document = {
-        id: data.roomId, // your backend sends `roomId`, not `id`
+        id: data.roomId, // backend sends roomId
         title: data.meta.title,
         lastModified: new Date(data.meta.lastModified).toLocaleString(),
         starred: data.meta.starred,
+        owner: data.meta.owner,
+        sharedWith: data.meta.sharedWith || [],
       };
+
       setDocuments([...documents, newDoc]);
       setDocument(newDoc);
-      console.log("Created and opened new document:", newDoc);
-    })
-    .catch(err => console.error("Error creating document:", err));
-};
 
-  const updateDocTitle = (documentId: string, newTitle: string) => {
-    setDocuments(
-      documents.map(doc => 
-        doc.id === documentId 
-          ? { ...doc, title: newTitle }
-          : doc
-      )
-    );
+      console.log("Created and opened new document:", newDoc);
+    } catch (err) {
+      console.error("Error creating document:", err);
+    }
   };
+
+
+  const updateDocTitle = async (documentId: string, newTitle: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("User not authenticated");
+      
+      const res = await fetch(`http://localhost:1234/api/update-doc/${documentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newTitle }),
+      });
+      const data = await res.json();
+      console.log("Update document response:", data);
+      if (!data.ok) throw new Error("Failed to update document");
+      
+      setDocuments(
+        documents.map(doc => 
+          doc.id === documentId 
+            ? { ...doc, title: newTitle, lastModified: new Date().toLocaleString() }
+            : doc
+        )
+      );
+    } catch (err) {
+      console.error("Error updating document title:", err);
+    }
+  };
+
   const openDoc = (doc: Document) => {    
     setDocument(doc);
     console.log(`Open document: ${doc.title}`);
@@ -160,13 +215,7 @@ const createDoc = () => {
                     <input
                       defaultValue={doc.title}
                       className="bg-transparent border-none outline-none focus:ring-0 w-full truncate text-foreground placeholder:text-muted-foreground"
-                        onChange={(e) => {
-                          fetch('http://3.111.55.107:1234/api/update-doc', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ roomId: doc.id, title: e.target.value })
-                          });
-                        }}
+                      onBlur={(e) => updateDocTitle(doc.id, e.target.value)}
                       />
                  </h3>
                   <div className="flex items-center gap-1 ml-2">
