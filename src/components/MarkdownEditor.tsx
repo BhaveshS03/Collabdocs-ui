@@ -25,7 +25,7 @@ export const MarkdownEditor = () => {
       return;
     }
     const wsp = new WebsocketProvider(
-      "ws://localhost:1234",
+      "ws://15.207.221.31:1234",
       roomId,
       doc
     );

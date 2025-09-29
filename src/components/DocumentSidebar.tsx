@@ -74,7 +74,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
   useEffect(() => {
     const fetchMyDocs = async () => {
       try {
-        const res = await fetch("http://localhost:1234/api/my-docs", {
+        const res = await fetch("http://15.207.221.31:1234/api/my-docs", {
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
           },
@@ -106,7 +106,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       const token = localStorage.getItem("token"); // get JWT
       if (!token) throw new Error("User not authenticated");
 
-      const res = await fetch("http://localhost:1234/api/create-doc", {
+      const res = await fetch("http://15.207.221.31:1234/api/create-doc", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -145,7 +145,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       const token = localStorage.getItem("token");
       if (!token) throw new Error("User not authenticated");
       
-      const res = await fetch(`http://localhost:1234/api/update-doc/${documentId}`, {
+      const res = await fetch(`http://15.207.221.31:1234/api/update-doc/${documentId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
