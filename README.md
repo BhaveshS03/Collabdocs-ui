@@ -1,73 +1,58 @@
-# Welcome to your Lovable project
+# 📄 CollabDocs
 
-## Project info
+CollabDocs is a **real-time collaborative document editor** similar to Google Docs.  
+Built with **React (frontend)**, **Bun (backend runtime)**, and **WebSockets** for seamless live editing.  
 
-**URL**: https://lovable.dev/projects/fcc78f92-6c44-4df1-a3fd-ae70346285c2
+Users can **create, edit, and collaborate** on documents in real-time with modern UI and fast performance.  
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚀 Features
 
-**Use Lovable**
+- ⚡ **Lightning Fast** – Optimized editor that handles large documents with ease.  
+- 🤝 **Real-time Collaboration** – Work together instantly with live updates via WebSockets.  
+- 🔒 **Secure & Private** – Built-in authentication and privacy controls.  
+- 📑 **Google Docs-like Login Flow** – Simple login/signup with session-based authentication.  
+- 📂 **Document Management** – Create, view, edit, and organize multiple documents.  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/fcc78f92-6c44-4df1-a3fd-ae70346285c2) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📸 Screenshots
 
-**Use your preferred IDE**
+### Landing Page
+<img width="1894" height="989" alt="Screenshot From 2025-09-30 14-15-11" src="https://github.com/user-attachments/assets/fc636f53-b995-443f-8381-941b3ee23940" />
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Document Editor
+<img width="1894" height="989" alt="Screenshot From 2025-09-30 14-17-04" src="https://github.com/user-attachments/assets/4e795a2a-3504-47ee-a813-914ac378ce33" />
 
-Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🛠️ Tech Stack
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+**Frontend:**
+- [React](https://react.dev/) – UI framework
+- [TailwindCSS](https://tailwindcss.com/) – Styling  
+- Context API / State Management
+
+**Backend:**
+- [Bun](https://bun.sh/) – Ultra-fast JavaScript runtime  
+- [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) – Real-time communication  
+
+**Database:**
+- MongoDB for user and meta database
+- snapshots for documents  
+
+---
+
+## 📦 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/BhaveshS03/Collabdocs-ui.git
+cd collabdocs
+npm install
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/fcc78f92-6c44-4df1-a3fd-ae70346285c2) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
