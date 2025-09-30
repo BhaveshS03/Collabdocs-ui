@@ -45,7 +45,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
   const { profile } = useAuth();
   //   const fetchDocs = async () => {
   //     try {
-  //       const res = await fetch("http://3.111.55.107:1234/api/active-docs");
+  //       const res = await fetch("http://3.111.55.107/api/active-docs");
   //       if (!res.ok) throw new Error("Failed to fetch documents");
 
   //       const data = await res.json(); // { rooms: [{ roomId, meta }] }
@@ -74,7 +74,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
   useEffect(() => {
     const fetchMyDocs = async () => {
       try {
-        const res = await fetch("https://api.myzen.works:1234/api/my-docs", {
+        const res = await fetch("https://api.myzen.works/api/my-docs", {
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
           },
@@ -106,7 +106,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       const token = localStorage.getItem("token"); // get JWT
       if (!token) throw new Error("User not authenticated");
 
-      const res = await fetch("https://api.myzen.works:1234/api/create-doc", {
+      const res = await fetch("https://api.myzen.works/api/create-doc", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -145,7 +145,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       const token = localStorage.getItem("token");
       if (!token) throw new Error("User not authenticated");
       
-      const res = await fetch(`https://api.myzen.works:1234/api/update-doc/${documentId}`, {
+      const res = await fetch(`https://api.myzen.works/api/update-doc/${documentId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

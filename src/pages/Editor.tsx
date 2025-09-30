@@ -20,7 +20,7 @@ const Editor = () => {
       if (!token) {
         throw new Error("No token found");
       }
-      await fetch("https://api.myzen.works:1234/api/profile", {
+      await fetch("https://api.myzen.works/api/profile", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
