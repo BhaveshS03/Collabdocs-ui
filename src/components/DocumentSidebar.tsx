@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAppContext } from "@/lib/appcontext";
 import { useAuth } from "@/lib/authcontext";
+import { ShareDocument } from "./addDoc";
 import { useEffect, useState } from "react";
 
 import {
@@ -43,34 +44,10 @@ interface DocumentSidebarProps {
 export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarProps) {
   const { documents, setDocuments, currentDocument, setDocument } = useAppContext();
   const { profile } = useAuth();
-  //   const fetchDocs = async () => {
-  //     try {
-  //       const res = await fetch("http://3.111.55.107/api/active-docs");
-  //       if (!res.ok) throw new Error("Failed to fetch documents");
-
-  //       const data = await res.json(); // { rooms: [{ roomId, meta }] }
-
-  //       const docs: Document[] = data.rooms
-  //         .filter((room: { roomId: string; meta?: any })  => room.roomId!=="undefined"  && room.meta && room.meta.owner !== "Bhaves") // ✅ skip if no meta
-  //         .map((room: { roomId: string; meta: any }) => ({
-  //           id: room.roomId,
-  //           title: room.meta.title || "Untitled",
-  //           createdAt: room.meta.createdAt || "",
-  //           lastModified: room.meta.lastModified || "",
-  //           owner: room.meta.owner || null,
-  //           currentUser: room.meta.current_user || null,
-  //           starred: room.meta.starred || false,
-  //         }));
-
-  //       console.log("Fetched documents:", docs);
-  //       setDocuments(docs);
-  //     } catch (err) {
-  //       console.error("Error fetching documents:", err);
-  //     }
-  //   };
-
-  //   fetchDocs();
-  // }, []);
+  const [shareOpen, setShareOpen] = useState(false);
+  const handleShare = (doc: any) => {
+    setShareOpen(true);
+  };
   useEffect(() => {
     const fetchMyDocs = async () => {
       try {
@@ -138,7 +115,6 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       console.error("Error creating document:", err);
     }
   };
-
 
   const updateDocTitle = async (documentId: string, newTitle: string) => {
     try {
@@ -248,19 +224,20 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleShare(doc);}}>
                           <Share2 className="w-4 h-4 mr-2" />
                           Share Document
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                        {/* <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                           <Download className="w-4 h-4 mr-2" />
                           Download
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
-                
+                <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} />
+ 
                 <div className="flex items-center gap-1 mt-1">
                   <Clock className="w-3 h-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">

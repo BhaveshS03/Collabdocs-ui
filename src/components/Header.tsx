@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Share2, Download, Settings, Menu, LogOut } from "lucide-react";
 import TitleInput from "./titleip";
 import { useAppContext } from "@/lib/appcontext";
+import { useState } from "react";
 interface HeaderProps {
   onMenuClick?: () => void;
   showMenuButton?: boolean;
@@ -13,7 +14,10 @@ import { ShareDocument } from "./addDoc";
 
 export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
   const { currentDocument:doc } = useAppContext();
-  const navigate = useNavigate();
+  const [shareOpen, setShareOpen] = useState(false);
+  const handleShare = () => {
+    setShareOpen(true);
+  };
   const { logout } = useAuth();
 
   return (
@@ -50,15 +54,18 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
 
       {/* Right: Actions and user */}
       <div className="flex items-center gap-1 sm:gap-3">
-        
-        <ShareDocument />
-        
+        <Button variant="ghost" size="sm" className="p-2" onClick={handleShare}>  
+            <Share2 className="w-4 h-4 mr-2"/>
+            Share
+        </Button>
+
         <Button variant="ghost" size="sm" className="p-2" onClick={logout}>
           <LogOut className="w-4 h-4"/>
         </Button>
 
         <div className="h-6 w-px bg-border mx-2 hidden sm:block" />
-
+        <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} />
+  
         {/* Collaboration avatars */}
         <div className="flex -space-x-2">
           <Avatar className="w-8 h-8 border-2 border-background">

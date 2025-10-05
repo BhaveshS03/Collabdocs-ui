@@ -7,7 +7,7 @@ export default function TitleInput({ doc }) {
         const controller = new AbortController();
 
         const timeout = setTimeout(() => {
-        fetch("http://3.111.55.107/api/update-doc", {
+        fetch("https://api.myzen.works/myzen.works/api/update-doc", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ roomId: doc.id, title }),
