@@ -21,7 +21,8 @@ import {
   Clock,
   Star,
   Share2,
-  Download
+  Download,
+  Delete
 } from "lucide-react";
 
 interface Document {
@@ -115,6 +116,23 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       console.error("Error creating document:", err);
     }
   };
+
+  const deleteDoc = async(documentId: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("User not authenticated");
+    
+    const res = await fetch(`https://api.myzen.works/api/delete-doc`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ docId: documentId}),
+    });
+    const data = await res.json();
+    console.log("Deleting a document:", data);
+    if (!data.ok) throw new Error("Failed to create document");
+  }
 
   const updateDocTitle = async (documentId: string, newTitle: string) => {
     try {
@@ -228,10 +246,10 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
                           <Share2 className="w-4 h-4 mr-2" />
                           Share Document
                         </DropdownMenuItem>
-                        {/* <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                          <Download className="w-4 h-4 mr-2" />
+                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); deleteDoc(doc.id)}}>
+                          <Delete className="w-4 h-4 mr-2" />
                           Download
-                        </DropdownMenuItem> */}
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
