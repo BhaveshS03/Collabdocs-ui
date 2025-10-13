@@ -21,8 +21,7 @@ import {
   Clock,
   Star,
   Share2,
-  Download,
-  Delete
+  Trash2
 } from "lucide-react";
 
 interface Document {
@@ -132,6 +131,9 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
     const data = await res.json();
     console.log("Deleting a document:", data);
     if (!data.ok) throw new Error("Failed to create document");
+    else {
+      window.location.reload();
+    }
   }
 
   const updateDocTitle = async (documentId: string, newTitle: string) => {
@@ -247,8 +249,8 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
                           Share Document
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={(e) => {e.stopPropagation(); deleteDoc(doc.id)}}>
-                          <Delete className="w-4 h-4 mr-2" />
-                          Download
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
