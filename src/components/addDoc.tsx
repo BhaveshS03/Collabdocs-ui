@@ -47,18 +47,23 @@ export function ShareDocument({ open, onOpenChange, doc }: ShareDocumentProps) {
       const response = await axios.post(
         "/api/share-doc",
         { docId, emailId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       return response.data;
     } catch (err: any) {
       // Use axios' error details when possible. DO NOT remove token here.
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
-        const serverMsg = err.response?.data?.error || err.message || "Failed to share document.";
+        const serverMsg =
+          err.response?.data?.error ||
+          err.message ||
+          "Failed to share document.";
 
         // For 401 we show a clear message but still do NOT auto-logout.
         if (status === 401) {
-          throw new Error(serverMsg || "Session expired — please sign in again.");
+          throw new Error(
+            serverMsg || "Session expired — please sign in again.",
+          );
         }
         throw new Error(serverMsg);
       }
@@ -105,7 +110,9 @@ export function ShareDocument({ open, onOpenChange, doc }: ShareDocumentProps) {
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Share “{documentToShare?.title || "Untitled"}”</AlertDialogTitle>
+          <AlertDialogTitle>
+            Share “{documentToShare?.title || "Untitled"}”
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Enter the collaborator’s email below to share this document.
             <Input
@@ -121,7 +128,9 @@ export function ShareDocument({ open, onOpenChange, doc }: ShareDocumentProps) {
               }}
             />
             {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-            {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
+            {success && (
+              <p className="mt-2 text-sm text-green-600">{success}</p>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

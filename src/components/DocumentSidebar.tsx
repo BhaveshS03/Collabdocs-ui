@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useAppContext } from "@/lib/appcontext";
 import { useAuth } from "@/lib/authcontext";
 import { ShareDocument } from "./addDoc";
@@ -13,10 +18,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  FileText, 
-  Plus, 
-  Search, 
+import {
+  FileText,
+  Plus,
+  Search,
   MoreVertical,
   Clock,
   Star,
@@ -32,7 +37,6 @@ interface Document {
   owner?: string | null;
   sharedWith?: string[];
   createdAt?: string;
-
 }
 
 interface DocumentSidebarProps {
@@ -41,11 +45,16 @@ interface DocumentSidebarProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarProps) {
-  const { documents, setDocuments, currentDocument, setDocument } = useAppContext();
+export function DocumentSidebar({
+  mobile,
+  open,
+  onOpenChange,
+}: DocumentSidebarProps) {
+  const { documents, setDocuments, currentDocument, setDocument } =
+    useAppContext();
   const { profile } = useAuth();
   const [shareOpen, setShareOpen] = useState(false);
-  const handleShare = (doc: any) => {
+  const handleShare = (doc: Document) => {
     setShareOpen(true);
   };
   useEffect(() => {
@@ -53,11 +62,11 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       try {
         const res = await fetch("https://api.myzen.works/api/my-docs", {
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         const data = await res.json();
-        console.log(data)
+        console.log(data);
         if (!data.ok) throw new Error("Failed to fetch documents");
 
         setDocuments(data.documents);
@@ -71,11 +80,9 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
 
   const toggleStar = (documentId: string) => {
     setDocuments(
-      documents.map(doc => 
-        doc.id === documentId 
-          ? { ...doc, starred: !doc.starred }
-          : doc
-      )
+      documents.map((doc) =>
+        doc.id === documentId ? { ...doc, starred: !doc.starred } : doc,
+      ),
     );
   };
   const createDoc = async () => {
@@ -87,7 +94,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // ✅ pass token
+          Authorization: `Bearer ${token}`, // ✅ pass token
         },
         body: JSON.stringify({
           title: "Untitled Document",
@@ -119,7 +126,7 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
   const deleteDoc = async(documentId: string) => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("User not authenticated");
-    
+
     const res = await fetch(`https://api.myzen.works/api/delete-doc`, {
       method: "POST",
       headers: {
@@ -140,32 +147,39 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("User not authenticated");
-      
-      const res = await fetch(`https://api.myzen.works/api/update-doc/${documentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+
+      const res = await fetch(
+        `https://api.myzen.works/api/update-doc/${documentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: newTitle }),
         },
-        body: JSON.stringify({ title: newTitle }),
-      });
+      );
       const data = await res.json();
       console.log("Update document response:", data);
       if (!data.ok) throw new Error("Failed to update document");
-      
+
       setDocuments(
-        documents.map(doc => 
-          doc.id === documentId 
-            ? { ...doc, title: newTitle, lastModified: new Date().toLocaleString() }
-            : doc
-        )
+        documents.map((doc) =>
+          doc.id === documentId
+            ? {
+                ...doc,
+                title: newTitle,
+                lastModified: new Date().toLocaleString(),
+              }
+            : doc,
+        ),
       );
     } catch (err) {
       console.error("Error updating document title:", err);
     }
   };
 
-  const openDoc = (doc: Document) => {    
+  const openDoc = (doc: Document) => {
     setDocument(doc);
     console.log(`Open document: ${doc.title}`);
   };
@@ -176,18 +190,15 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-foreground">Documents</h2>
-          <Button size="sm" className="h-8 w-8 p-0">
-            <Plus className="w-4 h-4" onClick={createDoc}/>
+          <Button size="sm" className="h-8 w-8 p-0" onClick={createDoc}>
+            <Plus className="w-4 h-4" />
           </Button>
         </div>
-        
+
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search documents..." 
-            className="pl-9 h-9"
-          />
+          <Input placeholder="Search documents..." className="pl-9 h-9" />
         </div>
       </div>
 
@@ -195,23 +206,26 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {documents.map((doc) => (
           <div key={doc.id}>
-          <Card 
-            key={doc.id} 
-            className="doc-card p-3 cursor-pointer hover:bg-accent/50 transition-colors"
-            onClick={() => mobile && onOpenChange?.(false)}
-          >
-            <div className="flex items-start gap-3" onClick={() => openDoc(doc)}>
-              <div className="mt-1">
-                <FileText className="w-4 h-4 text-muted-foreground" />
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm text-foreground truncate">
-                    <input
-                      defaultValue={doc.title}
-                      className="bg-transparent border-none outline-none focus:ring-0 w-full truncate text-foreground placeholder:text-muted-foreground"
-                      onBlur={(e) => updateDocTitle(doc.id, e.target.value)}
+            <Card
+              key={doc.id}
+              className="doc-card p-3 cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={() => mobile && onOpenChange?.(false)}
+            >
+              <div
+                className="flex items-start gap-3"
+                onClick={() => openDoc(doc)}
+              >
+                <div className="mt-1">
+                  <FileText className="w-4 h-4 text-muted-foreground" />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm text-foreground truncate">
+                      <input
+                        defaultValue={doc.title}
+                        className="bg-transparent border-none outline-none focus:ring-0 w-full truncate text-foreground placeholder:text-muted-foreground"
+                        onBlur={(e) => updateDocTitle(doc.id, e.target.value)}
                       />
                  </h3>
                   <div className="flex items-center gap-1 ml-2">
@@ -224,19 +238,19 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
                         toggleStar(doc.id);
                       }}
                     >
-                      <Star 
+                      <Star
                         className={`w-3 h-3 ${
-                          doc.starred 
-                            ? 'text-primary fill-current' 
+                          doc.starred
+                            ? 'text-primary fill-current'
                             : 'text-muted-foreground hover:text-primary'
-                        }`} 
+                        }`}
                       />
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="h-6 w-6 p-0"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -256,29 +270,24 @@ export function DocumentSidebar({ mobile, open, onOpenChange }: DocumentSidebarP
                     </DropdownMenu>
                   </div>
                 </div>
-                <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} />
- 
-                <div className="flex items-center gap-1 mt-1">
-                  <Clock className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    {doc.lastModified}
-                  </span>
-                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
           </div>
         ))}
       </div>
 
       {/* Footer actions */}
       <div className="p-4 border-t border-border">
-        <Button variant="outline" className="w-full" size="sm" onClick={createDoc}>
+        <Button
+          variant="outline"
+          className="w-full"
+          size="sm"
+          onClick={createDoc}
+        >
           <Plus className="w-4 h-4 mr-2" />
           New Document
         </Button>
       </div>
-  
     </>
   );
 
