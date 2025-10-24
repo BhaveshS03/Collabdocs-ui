@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { useAuth } from "./lib/authcontext";
 import Editor from "./pages/Editor";
+import GoogleOAuthCallback from "./components/GoogleOAuthCallback";
 
 const queryClient = new QueryClient();
 
@@ -29,10 +30,18 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/editor" element={<PrivateRoute><Editor /></PrivateRoute>} />
-   
+            <Route path="/auth/callback" element={<GoogleOAuthCallback />} />
+            <Route
+              path="/editor"
+              element={
+                <PrivateRoute>
+                  <Editor />
+                </PrivateRoute>
+              }
+            />
+
             {/* catch-all */}
-            <Route path="/" element={<Index/>} />
+            <Route path="/" element={<Index />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

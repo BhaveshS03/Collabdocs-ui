@@ -7,8 +7,21 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/authcontext";
 
@@ -35,22 +48,30 @@ export default function Login() {
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
-    await login(data.email, data.password).then(() => {
-      setIsLoading(false);
-      
-      navigate("/editor");
-    }).catch((error) => {
-      setIsLoading(false);
-      console.error("Login failed:", error);
-      alert("Login failed: " + error.message);
-    });
+    await login(data.email, data.password)
+      .then(() => {
+        setIsLoading(false);
+
+        navigate("/editor");
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        console.error("Login failed:", error);
+        alert("Login failed: " + error.message);
+      });
+  };
+  const handleGoogleLogin = () => {
+    // Redirect to Google OAuth endpoint
+    window.location.href = "https://api.myzen.works/api/google";
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Welcome back
+          </CardTitle>
           <CardDescription className="text-center">
             Enter your credentials to access your account
           </CardDescription>
@@ -75,7 +96,7 @@ export default function Login() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="password"
@@ -99,7 +120,7 @@ export default function Login() {
                           {showPassword ? (
                             <Eye className="h-4 w-4" />
                           ) : (
-                           <EyeOff className="h-4 w-4" />
+                            <EyeOff className="h-4 w-4" />
                           )}
                         </Button>
                       </div>
@@ -123,12 +144,19 @@ export default function Login() {
                 )}
               </Button>
             </form>
+            <button onClick={handleGoogleLogin} className="google-login-btn">
+              <img src="/google-icon.svg" alt="Google" />
+              Continue with Google
+            </button>
           </Form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link to="/register" className="text-primary hover:underline font-medium">
+              <Link
+                to="/register"
+                className="text-primary hover:underline font-medium"
+              >
                 Sign up
               </Link>
             </p>
