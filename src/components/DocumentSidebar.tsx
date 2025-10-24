@@ -57,34 +57,28 @@ export function DocumentSidebar({
   const handleShare = (doc: Document) => {
     setShareOpen(true);
   };
+
+  const fetchMyDocs = async () => {
+    try {
+      const res = await fetch("https://api.myzen.works/api/my-docs", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await res.json();
+      console.log(data);
+      if (!data.ok) throw new Error("Failed to fetch documents");
+
+      setDocuments(data.documents);
+    } catch (err) {
+      console.error("Error fetching user documents:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchMyDocs = async () => {
-      try {
-        const res = await fetch("https://api.myzen.works/api/my-docs", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        const data = await res.json();
-        console.log(data);
-        if (!data.ok) throw new Error("Failed to fetch documents");
-
-        setDocuments(data.documents);
-      } catch (err) {
-        console.error("Error fetching user documents:", err);
-      }
-    };
-
     fetchMyDocs();
   }, []);
 
-  const toggleStar = (documentId: string) => {
-    setDocuments(
-      documents.map((doc) =>
-        doc.id === documentId ? { ...doc, starred: !doc.starred } : doc,
-      ),
-    );
-  };
   const createDoc = async () => {
     try {
       const token = localStorage.getItem("token"); // get JWT
@@ -180,7 +174,8 @@ export function DocumentSidebar({
           doc.id === documentId
             ? {
                 ...doc,
-                title: newTitle,
+                ...(newTitle !== undefined && { title: newTitle }),
+                ...(starred !== undefined && { starred: starred }),
                 lastModified: new Date().toLocaleString(),
               }
             : doc,
@@ -237,9 +232,10 @@ export function DocumentSidebar({
                       <input
                         defaultValue={doc.title}
                         className="bg-transparent border-none outline-none focus:ring-0 w-full truncate text-foreground placeholder:text-muted-foreground"
-                        onBlur={(e) =>
-                          updateDocTitle(doc.id, e.target.value, undefined)
-                        }
+                        onBlur={(e) => {
+                          updateDocTitle(doc.id, e.target.value, undefined);
+                          fetchMyDocs();
+                        }}
                       />
                     </h3>
                     <div className="flex items-center gap-1 ml-2">
@@ -249,8 +245,8 @@ export function DocumentSidebar({
                         className="h-6 w-6 p-0"
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleStar(doc.id);
                           updateDocTitle(doc.id, undefined, !doc.starred);
+                          fetchMyDocs();
                         }}
                       >
                         <Star
