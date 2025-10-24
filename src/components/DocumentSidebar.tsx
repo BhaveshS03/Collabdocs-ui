@@ -57,6 +57,17 @@ export function DocumentSidebar({
   const handleShare = (doc: Document) => {
     setShareOpen(true);
   };
+  const getSortedDocuments = () => {
+    return [...documents].sort((a, b) => {
+      // Sort by starred status (starred items first), then by last modified
+      if (a.starred && !b.starred) return -1;
+      if (!a.starred && b.starred) return 1;
+      // If both have the same starred status, sort by last modified date
+      return (
+        new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+      );
+    });
+  };
 
   const fetchMyDocs = async () => {
     try {
@@ -211,7 +222,7 @@ export function DocumentSidebar({
 
       {/* Documents list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {documents.map((doc) => (
+        {getSortedDocuments().map((doc) => (
           <div key={doc.id}>
             <Card
               key={doc.id}
