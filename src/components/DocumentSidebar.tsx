@@ -26,7 +26,7 @@ import {
   Clock,
   Star,
   Share2,
-  Trash2
+  Trash2,
 } from "lucide-react";
 
 interface Document {
@@ -123,7 +123,7 @@ export function DocumentSidebar({
     }
   };
 
-  const deleteDoc = async(documentId: string) => {
+  const deleteDoc = async (documentId: string) => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("User not authenticated");
 
@@ -131,9 +131,9 @@ export function DocumentSidebar({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ docId: documentId}),
+      body: JSON.stringify({ docId: documentId }),
     });
     const data = await res.json();
     console.log("Deleting a document:", data);
@@ -141,12 +141,27 @@ export function DocumentSidebar({
     else {
       window.location.reload();
     }
-  }
+  };
 
-  const updateDocTitle = async (documentId: string, newTitle: string) => {
+  const updateDocTitle = async (
+    documentId: string,
+    newTitle?: string,
+    starred?: boolean,
+  ) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("User not authenticated");
+
+      // Create request body with conditional fields
+      const requestBody: { title?: string; starred?: boolean } = {};
+
+      if (newTitle !== undefined) {
+        requestBody.title = newTitle;
+      }
+
+      if (starred !== undefined) {
+        requestBody.starred = starred;
+      }
 
       const res = await fetch(
         `https://api.myzen.works/api/update-doc/${documentId}`,
@@ -156,12 +171,9 @@ export function DocumentSidebar({
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ title: newTitle }),
+          body: JSON.stringify(requestBody),
         },
       );
-      const data = await res.json();
-      console.log("Update document response:", data);
-      if (!data.ok) throw new Error("Failed to update document");
 
       setDocuments(
         documents.map((doc) =>
@@ -225,49 +237,63 @@ export function DocumentSidebar({
                       <input
                         defaultValue={doc.title}
                         className="bg-transparent border-none outline-none focus:ring-0 w-full truncate text-foreground placeholder:text-muted-foreground"
-                        onBlur={(e) => updateDocTitle(doc.id, e.target.value)}
+                        onBlur={(e) =>
+                          updateDocTitle(doc.id, e.target.value, undefined)
+                        }
                       />
-                 </h3>
-                  <div className="flex items-center gap-1 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleStar(doc.id);
-                      }}
-                    >
-                      <Star
-                        className={`w-3 h-3 ${
-                          doc.starred
-                            ? 'text-primary fill-current'
-                            : 'text-muted-foreground hover:text-primary'
-                        }`}
-                      />
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreVertical className="w-3 h-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); handleShare(doc);}}>
-                          <Share2 className="w-4 h-4 mr-2" />
-                          Share Document
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => {e.stopPropagation(); deleteDoc(doc.id)}}>
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    </h3>
+                    <div className="flex items-center gap-1 ml-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStar(doc.id);
+                          updateDocTitle(doc.id, undefined, !doc.starred);
+                        }}
+                      >
+                        <Star
+                          className={`w-3 h-3 ${
+                            doc.starred
+                              ? "text-primary fill-current"
+                              : "text-muted-foreground hover:text-primary"
+                          }`}
+                        />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="w-3 h-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShare(doc);
+                            }}
+                          >
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Share Document
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteDoc(doc.id);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 </div>
               </div>
