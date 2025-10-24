@@ -24,24 +24,26 @@ const Editor = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error("Invalid token");
-        }
-        return response.json();
-      }).then((data) => {
-        console.log("User profile data:", data);
-        localStorage.setItem("userName", data.user.name);
-      }).catch((error) => {
-        console.error("Error fetching profile:", error);
-        window.location.href = "/";
-        localStorage.removeItem("userName");
-        localStorage.removeItem("token");
-      });
-    } 
-    catch (error) {
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Invalid token");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("User profile data:", data);
+          localStorage.setItem("userName", data.user.name);
+        })
+        .catch((error) => {
+          console.error("Error fetching profile:", error);
+          window.location.href = "/";
+          localStorage.removeItem("userName");
+          localStorage.removeItem("token");
+        });
+    } catch (error) {
       console.error("Error during authentication check:", error);
       window.location.href = "/";
     }
@@ -52,34 +54,33 @@ const Editor = () => {
 
   return (
     <MilkdownProvider>
-    <AppContextProvider>
-    <div className="h-screen flex flex-col bg-background">
-      <Header 
-        onMenuClick={() => setSidebarOpen(true)}
-        showMenuButton={isMobile}
-      />
-      
-      <div className="flex flex-1 overflow-hidden">
-        {!isMobile && <DocumentSidebar />}
-        
-        <div className="flex-1 flex flex-col">
-          {/* <Toolbar /> */}
-          <MarkdownEditor />
-        </div>
-      </div>
+      <AppContextProvider>
+        <div className="h-screen flex flex-col bg-background">
+          <Header
+            onMenuClick={() => setSidebarOpen(true)}
+            showMenuButton={isMobile}
+          />
 
-      {/* Mobile sidebar */}
-      {isMobile && (
-        <DocumentSidebar 
-          mobile={true}
-          open={sidebarOpen}
-          onOpenChange={setSidebarOpen}
-        />
-      )}
-    </div>
-    </AppContextProvider>
+          <div className="flex flex-1 overflow-hidden">
+            {!isMobile && <DocumentSidebar />}
+
+            <div className="flex-1 flex flex-col">
+              {/* <Toolbar /> */}
+              <MarkdownEditor />
+            </div>
+          </div>
+
+          {/* Mobile sidebar */}
+          {isMobile && (
+            <DocumentSidebar
+              mobile={true}
+              open={sidebarOpen}
+              onOpenChange={setSidebarOpen}
+            />
+          )}
+        </div>
+      </AppContextProvider>
     </MilkdownProvider>
-    
   );
 };
 
