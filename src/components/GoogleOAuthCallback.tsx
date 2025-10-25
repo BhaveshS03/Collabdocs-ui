@@ -26,11 +26,13 @@ const GoogleOAuthCallback: React.FC = () => {
           localStorage.setItem("token", token);
 
           // Redirect to editor
-          navigate("/editor", { replace: true });
+          window.location.href =
+            "https://main.d220red9g3z692.amplifyapp.com/editor";
         } else {
           // No token in URL, check if we're authenticated
           await checkAuth();
-          navigate("/editor", { replace: true });
+          window.location.href =
+            "https://main.d220red9g3z692.amplifyapp.com/editor";
         }
       } catch (err) {
         console.error("OAuth callback error:", err);
