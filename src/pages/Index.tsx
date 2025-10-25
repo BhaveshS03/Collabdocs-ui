@@ -1,9 +1,30 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, FileText, Users, Zap, Shield, Cloud, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowRight,
+  FileText,
+  Users,
+  Zap,
+  Shield,
+  Cloud,
+  Star,
+} from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/lib/authcontext";
 
 const Index = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  // If user is authenticated, redirect to the editor instead of showing the landing page
+  if (isAuthenticated && !loading) {
+    return <Navigate to="/editor" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -32,8 +53,9 @@ const Index = () => {
             <span className="text-primary block">Document Editing</span>
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-            Create, collaborate, and share documents with powerful tools designed for modern teams. 
-            Experience seamless editing with real-time collaboration.
+            Create, collaborate, and share documents with powerful tools
+            designed for modern teams. Experience seamless editing with
+            real-time collaboration.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/register">
@@ -58,10 +80,11 @@ const Index = () => {
               Everything you need to create amazing documents
             </h3>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Powerful features that make document creation and collaboration effortless
+              Powerful features that make document creation and collaboration
+              effortless
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="doc-card border-border/50 shadow-soft">
               <CardHeader>
@@ -70,7 +93,8 @@ const Index = () => {
                 </div>
                 <CardTitle>Lightning Fast</CardTitle>
                 <CardDescription>
-                  Experience blazing-fast performance with our optimized editor that handles large documents with ease.
+                  Experience blazing-fast performance with our optimized editor
+                  that handles large documents with ease.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -82,7 +106,8 @@ const Index = () => {
                 </div>
                 <CardTitle>Real-time Collaboration</CardTitle>
                 <CardDescription>
-                  Work together in real-time with your team. See changes instantly and collaborate seamlessly.
+                  Work together in real-time with your team. See changes
+                  instantly and collaborate seamlessly.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -94,7 +119,8 @@ const Index = () => {
                 </div>
                 <CardTitle>Secure & Private</CardTitle>
                 <CardDescription>
-                  Your documents are protected with enterprise-grade security and privacy controls.
+                  Your documents are protected with enterprise-grade security
+                  and privacy controls.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -106,7 +132,8 @@ const Index = () => {
                 </div>
                 <CardTitle>Cloud Sync</CardTitle>
                 <CardDescription>
-                  Access your documents anywhere, anytime. Automatic cloud sync keeps everything up to date.
+                  Access your documents anywhere, anytime. Automatic cloud sync
+                  keeps everything up to date.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -118,7 +145,8 @@ const Index = () => {
                 </div>
                 <CardTitle>Rich Formatting</CardTitle>
                 <CardDescription>
-                  Create beautiful documents with advanced formatting options and professional templates.
+                  Create beautiful documents with advanced formatting options
+                  and professional templates.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -130,7 +158,8 @@ const Index = () => {
                 </div>
                 <CardTitle>Smart Organization</CardTitle>
                 <CardDescription>
-                  Organize your documents with folders, tags, and powerful search capabilities.
+                  Organize your documents with folders, tags, and powerful
+                  search capabilities.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -145,7 +174,8 @@ const Index = () => {
             Ready to transform your workflow?
           </h3>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of teams already using CollabDocs to create amazing documents together.
+            Join thousands of teams already using CollabDocs to create amazing
+            documents together.
           </p>
           <Link to="/register">
             <Button size="lg" className="shadow-glow">
