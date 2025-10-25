@@ -55,7 +55,7 @@ const Editor = () => {
   return (
     <MilkdownProvider>
       <AppContextProvider>
-        <div className="h-screen flex flex-col bg-background">
+        <div className="h-screen flex flex-col bg-background overflow-hidden">
           <Header
             onMenuClick={() => setSidebarOpen(true)}
             showMenuButton={isMobile}
@@ -64,9 +64,11 @@ const Editor = () => {
           <div className="flex flex-1 overflow-hidden">
             {!isMobile && <DocumentSidebar />}
 
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col overflow-hidden">
               {/* <Toolbar /> */}
-              <MarkdownEditor />
+              <div className="flex-1 overflow-y-auto">
+                <MarkdownEditor />
+              </div>
             </div>
           </div>
 
