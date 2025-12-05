@@ -3,13 +3,14 @@ import { Milkdown, useEditor } from "@milkdown/react";
 import { collab, collabServiceCtx } from "@milkdown/plugin-collab";
 import { Doc } from "yjs";
 import { WebsocketProvider } from "y-websocket";
-
+import DebugPanel from "./DebugPanel";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
 import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "@/lib/appcontext";
 
 export const MarkdownEditor = () => {
+  const isDev = process.env.NODE_ENV === 'development';
   const [crepe, setCrepe] = useState<Crepe | null>(null);
   const [status, setStatus] = useState<
     "Connecting" | "Connected" | "Disconnected"
@@ -17,7 +18,6 @@ export const MarkdownEditor = () => {
   const { currentDocument, setCollaborators } = useAppContext();
   let roomId = currentDocument?.id;
 
-  // if (!roomId) return <div>Please select or create a document.</div>;
   console.log("MarkdownEditor with roomId:", roomId);
 
   // Create Yjs Doc + Provider
@@ -62,6 +62,7 @@ export const MarkdownEditor = () => {
     },
     [roomId, wsProvider, doc],
   );
+  
   useEffect(() => {
     if (!wsProvider) return;
 
@@ -99,7 +100,7 @@ export const MarkdownEditor = () => {
       crepe.editor.action((ctx) => {
         const collabService = ctx.get(collabServiceCtx);
         collabService
-          .bindDoc(doc) // connect Y.Doc to Milkdown
+          .bindDoc(doc)
           .setAwareness(wsProvider.awareness)
           .connect();
       });
@@ -116,40 +117,41 @@ export const MarkdownEditor = () => {
   }, [crepe, doc, wsProvider]);
 
   const [isEditing, setIsEditing] = useState(false);
+  
   return (
-    <div className="flex-1 flex justify-center p-4 sm:p-8 organic-bg">
-      <div className="w-full max-w-4xl">
-        <div
-          className={`editor-content min-h-[500px] sm:min-h-[700px] p-6 sm:p-12 rounded-xl ${
-            isEditing ? "ring-2 ring-primary/20" : ""
-          }`}
-        >
-          {!roomId ? (
-            <div className="text-center text-muted-foreground">
-              Please select or create a document.
-            </div>
-          ) : (
-            <Milkdown />
-          )}
+    <div className="flex-1 flex gap-4 p-4 sm:p-8 organic-bg">
+      {/* Main Editor Area */}
+      <div className="flex-1 flex justify-center">
+        <div className="w-full max-w-4xl">
+          <div
+            className={`editor-content min-h-[500px] sm:min-h-[700px] p-6 sm:p-12 rounded-xl ${
+              isEditing ? "ring-2 ring-primary/20" : ""
+            }`}
+          >
+            {!roomId ? (
+              <div className="text-center text-muted-foreground">
+                Please select or create a document.
+              </div>
+            ) : (
+              <Milkdown />
+            )}
+          </div>
 
-          {/* Collaboration cursors placeholder */}
-          {/* <div className="absolute top-16 left-16 collab-cursor bg-blue-500">
-            <div className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-              Alex is editing
-            </div>
-          </div> */}
-        </div>
-
-        {/* Document stats */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:justify-between gap-2 text-sm text-muted-foreground">
-          <span>Last saved: Just now</span>
-          <span>Status: {status}</span>
-          <div className="flex gap-4">
-            {/* <span>Words: {content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length}</span> */}
-            {/* <span className="hidden sm:inline">Characters: {content.replace(/<[^>]*>/g, '').length}</span> */}
+          {/* Document stats */}
+          <div className="mt-4 flex flex-col sm:flex-row sm:justify-between gap-2 text-sm text-muted-foreground">
+            <span>Last saved: Just now</span>
+            <span>Status: {status}</span>
+            <div className="flex gap-4"></div>
           </div>
         </div>
       </div>
+
+      {/* Debug Panel - Side by Side */}
+      {isDev && wsProvider && (
+        <div className="w-80 flex-shrink-0">
+          <DebugPanel provider={wsProvider} />
+        </div>
+      )}
     </div>
   );
 };

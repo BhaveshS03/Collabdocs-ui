@@ -45,6 +45,9 @@ interface DocumentSidebarProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+export const API_BASE = import.meta.env.VITE_API_BASE_URL;
+export const api = (path: string) => `${API_BASE}${path}`;
+
 export function DocumentSidebar({
   mobile,
   open,
@@ -71,7 +74,7 @@ export function DocumentSidebar({
 
   const fetchMyDocs = async () => {
     try {
-      const res = await fetch("https://api.myzen.works/api/my-docs", {
+      const res = await fetch(api("/my-docs"), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -95,7 +98,7 @@ export function DocumentSidebar({
       const token = localStorage.getItem("token"); // get JWT
       if (!token) throw new Error("User not authenticated");
 
-      const res = await fetch("https://api.myzen.works/api/create-doc", {
+      const res = await fetch(api("/create-doc"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +135,7 @@ export function DocumentSidebar({
     const token = localStorage.getItem("token");
     if (!token) throw new Error("User not authenticated");
 
-    const res = await fetch(`https://api.myzen.works/api/delete-doc`, {
+    const res = await fetch(api("/delete-doc"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -169,7 +172,7 @@ export function DocumentSidebar({
       }
 
       const res = await fetch(
-        `https://api.myzen.works/api/update-doc/${documentId}`,
+        api(`/update-doc/${documentId}`),
         {
           method: "PUT",
           headers: {

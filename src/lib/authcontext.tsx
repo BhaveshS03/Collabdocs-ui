@@ -30,7 +30,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-axios.defaults.baseURL = "https://api.myzen.works";
+axios.defaults.baseURL =  import.meta.env.VITE_API_BASE_URL || "https://api.myzen.works";
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+export const API_BASE = import.meta.env.VITE_API_BASE_URL;
+export const api = (path: string) => `${API_BASE}${path}`;
 
 export default function TitleInput({ doc }) {
   const [title, setTitle] = useState(doc?.title);
@@ -7,7 +9,7 @@ export default function TitleInput({ doc }) {
         const controller = new AbortController();
 
         const timeout = setTimeout(() => {
-        fetch("https://api.myzen.works/myzen.works/api/update-doc", {
+        fetch(api("/update-doc"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ roomId: doc.id, title }),
