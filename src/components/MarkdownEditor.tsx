@@ -10,7 +10,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "@/lib/appcontext";
 
 export const MarkdownEditor = () => {
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = import.meta.env.VITE_NODE_ENV === 'development';
+  const wsUrl = isDev ? "ws://localhost:1234" : "wss://api.myzen.works";
+
   const [crepe, setCrepe] = useState<Crepe | null>(null);
   const [status, setStatus] = useState<
     "Connecting" | "Connected" | "Disconnected"
@@ -27,7 +29,7 @@ export const MarkdownEditor = () => {
     if (!roomId) {
       return;
     }
-    const wsp = new WebsocketProvider("wss://api.myzen.works", roomId, doc);
+    const wsp = new WebsocketProvider(wsUrl, roomId, doc);
 
     wsp.on("status", (event) => {
       console.log("[CLIENT] WS status:", event.status);

@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/authcontext";
 
@@ -37,6 +38,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -51,15 +53,23 @@ export default function Login() {
     await login(data.email, data.password)
       .then(() => {
         setIsLoading(false);
-
+        toast({
+          title: "Success",
+          description: "You have been logged in successfully.",
+        });
         navigate("/editor");
       })
       .catch((error) => {
         setIsLoading(false);
         console.error("Login failed:", error);
-        alert("Login failed: " + error.message);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message || "Invalid email or password. Please try again.",
+        });
       });
   };
+
   const handleGoogleLogin = () => {
     // Redirect to Google OAuth endpoint
     window.location.href = "https://api.myzen.works/api/google";

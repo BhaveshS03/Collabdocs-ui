@@ -1,29 +1,32 @@
 import { useState, useEffect } from "react";
-export const API_BASE = import.meta.env.VITE_API_BASE_URL;
-export const api = (path: string) => `${API_BASE}${path}`;
+import api from "@/lib/api";
 
 export default function TitleInput({ doc }) {
-  const [title, setTitle] = useState(doc?.title);
-    useEffect(() => {
-        if (!doc) return;
-        const controller = new AbortController();
+  const [title, setTitle] = useState(doc?.title ?? "");
 
-        const timeout = setTimeout(() => {
-        fetch(api("/update-doc"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ roomId: doc.id, title }),
-            signal: controller.signal
-        }).catch((err) => {
-            if (err.name !== "AbortError") console.error(err);
+  useEffect(() => {
+    if (!doc) return;
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      api
+        .post(
+          "/update-doc",                    
+          { roomId: doc.id, title },    
+          { signal: controller.signal },
+        )
+        .catch((err) => {
+          if (err.name !== "CanceledError" && err.name !== "AbortError") {
+            console.error(err);
+          }
         });
-        }, 500); // debounce 500ms
+    }, 500); // debounce 500ms
 
-        return () => {
-        clearTimeout(timeout);
-        controller.abort(); // cancel previous request if value changes
-        };
-    }, [title, doc?.id]);
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [title, doc?.id]);
 
   return (
     <input

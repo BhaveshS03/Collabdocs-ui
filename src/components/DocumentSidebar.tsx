@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import api  from "@/lib/api";
 import {
   Sheet,
   SheetContent,
@@ -45,8 +46,6 @@ interface DocumentSidebarProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export const API_BASE = import.meta.env.VITE_API_BASE_URL;
-export const api = (path: string) => `${API_BASE}${path}`;
 
 export function DocumentSidebar({
   mobile,
@@ -74,15 +73,10 @@ export function DocumentSidebar({
 
   const fetchMyDocs = async () => {
     try {
-      const res = await fetch(api("/my-docs"), {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const data = await res.json();
-      console.log(data);
+      const res = await api.get("/api/my-docs");
+      const data = res.data;
+      // console.log(data);
       if (!data.ok) throw new Error("Failed to fetch documents");
-
       setDocuments(data.documents);
     } catch (err) {
       console.error("Error fetching user documents:", err);
@@ -95,59 +89,44 @@ export function DocumentSidebar({
 
   const createDoc = async () => {
     try {
-      const token = localStorage.getItem("token"); // get JWT
-      if (!token) throw new Error("User not authenticated");
-
-      const res = await fetch(api("/create-doc"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ pass token
-        },
-        body: JSON.stringify({
-          title: "Untitled Document",
-        }),
+      const res = await api.post("/api/create-doc", {
+        title: "Untitled Document",
       });
-
-      const data = await res.json();
+  
+      const data = res.data;
       console.log("Create document response:", data);
       if (!data.ok) throw new Error("Failed to create document");
-
+  
       const newDoc: Document = {
-        id: data.roomId, // backend sends roomId
+        id: data.roomId,
         title: data.meta.title,
         lastModified: new Date(data.meta.lastModified).toLocaleString(),
         starred: data.meta.starred,
         owner: data.meta.owner,
         sharedWith: data.meta.sharedWith || [],
       };
-
+  
       setDocuments([...documents, newDoc]);
       setDocument(newDoc);
-
       console.log("Created and opened new document:", newDoc);
     } catch (err) {
       console.error("Error creating document:", err);
     }
   };
+  
 
   const deleteDoc = async (documentId: string) => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await fetch(api("/delete-doc"), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ docId: documentId }),
-    });
-    const data = await res.json();
-    console.log("Deleting a document:", data);
-    if (!data.ok) throw new Error("Failed to create document");
-    else {
-      window.location.reload();
+    try {
+      const res = await api.post("/api/delete-doc", { docId: documentId });
+      const data = res.data;
+      console.log("Deleting a document:", data);
+  
+      if (!data.ok) throw new Error("Failed to delete document");
+      else {
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Error deleting document:", err);
     }
   };
 
@@ -157,39 +136,22 @@ export function DocumentSidebar({
     starred?: boolean,
   ) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("User not authenticated");
-
-      // Create request body with conditional fields
       const requestBody: { title?: string; starred?: boolean } = {};
 
       if (newTitle !== undefined) {
         requestBody.title = newTitle;
       }
-
       if (starred !== undefined) {
         requestBody.starred = starred;
       }
-
-      const res = await fetch(
-        api(`/update-doc/${documentId}`),
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        },
-      );
-
+      await api.put(`/api/update-doc/${documentId}`, requestBody);
       setDocuments(
         documents.map((doc) =>
           doc.id === documentId
             ? {
                 ...doc,
                 ...(newTitle !== undefined && { title: newTitle }),
-                ...(starred !== undefined && { starred: starred }),
+                ...(starred !== undefined && { starred }),
                 lastModified: new Date().toLocaleString(),
               }
             : doc,

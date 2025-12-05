@@ -6,6 +6,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { AppContextProvider } from "@/lib/appcontext";
 import { MilkdownProvider } from "@milkdown/react";
+import api from "@/lib/api";
 
 const Editor = () => {
   const isMobile = useIsMobile();
@@ -20,31 +21,18 @@ const Editor = () => {
       if (!token) {
         throw new Error("No token found");
       }
-      await fetch("https://api.myzen.works/api/profile", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Invalid token");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("User profile data:", data);
-          localStorage.setItem("userName", data.user.name);
-        })
-        .catch((error) => {
-          console.error("Error fetching profile:", error);
-          window.location.href = "/";
-          localStorage.removeItem("userName");
-          localStorage.removeItem("token");
-        });
+  
+      const res = await api.get("/api/profile");
+  
+      console.log("User profile data:", res.data);
+      localStorage.setItem("userName", res.data.user.name);
+  
     } catch (error) {
-      console.error("Error during authentication check:", error);
+      console.error("Error fetching profile:", error);
+  
+      localStorage.removeItem("userName");
+      localStorage.removeItem("token");
+  
       window.location.href = "/";
     }
   }

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Card,
   CardContent,
@@ -44,6 +45,7 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -60,14 +62,23 @@ export default function Register() {
     await register(data.fullName, data.email, data.password)
       .then(() => {
         setIsLoading(false);
+        toast({
+          title: "Account Created",
+          description: "Your account has been created successfully.",
+        });
         navigate("/editor");
       })
       .catch((error) => {
         setIsLoading(false);
-        console.error("Login failed:", error);
-        alert("Login failed: " + error.message);
+        console.error("Registration failed:", error);
+        toast({
+          variant: "destructive",
+          title: "Registration Failed",
+          description: error.message || "Unable to create account. Please try again.",
+        });
       });
   };
+  
   const handleGoogleLogin = () => {
     // Redirect to Google OAuth endpoint
     window.location.href = "https://api.myzen.works/api/google";

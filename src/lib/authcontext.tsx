@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, {
   createContext,
   useContext,
@@ -6,6 +5,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import api from "@/lib/api";
 
 interface User {
   id: string;
@@ -30,8 +30,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-axios.defaults.baseURL =  import.meta.env.VITE_API_BASE_URL || "https://api.myzen.works";
-axios.defaults.headers.common["Content-Type"] = "application/json";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
@@ -40,33 +38,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Set up axios interceptor for auth tokens
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common["Authorization"];
-    }
-
     checkAuth();
-  }, [isAuthenticated]);
+  }, []);
 
   const checkAuth = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       setLoading(false);
+      setIsAuthenticated(false);
       return;
     }
 
     try {
-      const response = await axios.get("/api/status");
+      const response = await api.get("/api/status");
       setUser(response.data.user);
       setIsAuthenticated(true);
-    } catch (error) {
-      // Token is invalid
+    } catch {
       localStorage.removeItem("token");
-      delete axios.defaults.headers.common["Authorization"];
       setIsAuthenticated(false);
       setUser(null);
     } finally {
@@ -76,16 +65,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post("/api/login", { email, password });
+      const response = await api.post("/api/login", { email, password });
+
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        axios.defaults.headers.common["Authorization"] =
-          `Bearer ${response.data.token}`;
         setUser(response.data.user);
         setIsAuthenticated(true);
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
       throw new Error(error.response?.data?.error || "Login failed");
     }
   };
@@ -96,44 +83,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string,
   ) => {
     try {
-      const response = await axios.post("/api/register", {
+      const response = await api.post("/api/register", {
         fullName: fullName,
         email,
         password,
       });
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        axios.defaults.headers.common["Authorization"] =
-          `Bearer ${response.data.token}`;
         setUser(response.data.user);
         setIsAuthenticated(true);
       }
     } catch (error: any) {
-      console.error("Registration failed:", error);
       throw new Error(error.response?.data?.error || "Registration failed");
     }
   };
 
   const profile = async (): Promise<User> => {
     try {
-      const response = await axios.get("/api/profile");
+      const response = await api.get("/api/profile");
       setUser(response.data.user);
       return response.data.user;
     } catch (error: any) {
-      console.error("Fetching profile failed:", error);
       logout();
       throw new Error(error.response?.data?.error || "Failed to fetch profile");
     }
   };
 
   const googleLogin = () => {
-    // Redirect to Google OAuth endpoint
-    window.location.href = `${axios.defaults.baseURL}/api/google`;
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/google`;
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    delete axios.defaults.headers.common["Authorization"];
     setIsAuthenticated(false);
     setUser(null);
   };
@@ -159,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;

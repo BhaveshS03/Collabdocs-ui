@@ -126,10 +126,9 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
 
        <input
           type="text"
-          defaultValue="Untitled Document"
+          defaultValue="Documents"
           className="text-base sm:text-lg font-medium bg-transparent border-none outline-none focus:bg-accent rounded px-2 py-1 min-w-0 flex-1 max-w-[150px] sm:max-w-xs"
         />
-        <TitleInput doc={doc} />
       </div>
       {/* Collaboration avatars */}
       <div className="flex -space-x-2">
