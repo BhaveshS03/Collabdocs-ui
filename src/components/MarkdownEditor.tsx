@@ -8,6 +8,11 @@ import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
 import { useEffect, useMemo, useState } from "react";
 import { useAppContext } from "@/lib/appcontext";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import api from "@/lib/api";
 
 export const MarkdownEditor = () => {
   const isDev = import.meta.env.VITE_NODE_ENV === 'development';
@@ -19,6 +24,12 @@ export const MarkdownEditor = () => {
   >("Connecting");
   const { currentDocument, setCollaborators } = useAppContext();
   let roomId = currentDocument?.id;
+
+  // Summarization state
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   console.log("MarkdownEditor with roomId:", roomId);
 
@@ -67,7 +78,7 @@ export const MarkdownEditor = () => {
   
   useEffect(() => {
     if (!wsProvider) return;
-
+    console.log("CLIENT keys:", doc.share);
     const updateCollaborators = () => {
       const users = [];
       wsProvider.awareness.getStates().forEach((state, clientId) => {
@@ -119,6 +130,33 @@ export const MarkdownEditor = () => {
   }, [crepe, doc, wsProvider]);
 
   const [isEditing, setIsEditing] = useState(false);
+
+  // Fetch summary function
+  const fetchSummary = async () => {
+    if (!roomId) return;
+    
+    setSummaryLoading(true);
+    setSummaryError(null);
+    
+    try {
+      const response = await api.get(`/api/summarize-doc/${roomId}`);
+
+      const data = response.data;
+      setSummary(data.summary || "No summary available");
+    } catch (error) {
+      console.error("Error fetching summary:", error);
+      setSummaryError(error instanceof Error ? error.message : "Failed to generate summary");
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  // Fetch summary when panel opens
+  useEffect(() => {
+    if (summaryOpen && !summary) {
+      fetchSummary();
+    }
+  }, [summaryOpen]);
   
   return (
     <div className="flex-1 flex gap-4 p-4 sm:p-8 organic-bg">
@@ -126,7 +164,7 @@ export const MarkdownEditor = () => {
       <div className="flex-1 flex justify-center">
         <div className="w-full max-w-4xl">
           <div
-            className={`editor-content min-h-[500px] sm:min-h-[700px] p-6 sm:p-12 rounded-xl ${
+            className={`editor-content min-h-[400px] sm:min-h-[600px] p-6 sm:p-12 rounded-xl ${
               isEditing ? "ring-2 ring-primary/20" : ""
             }`}
           >
@@ -139,11 +177,68 @@ export const MarkdownEditor = () => {
             )}
           </div>
 
-          {/* Document stats */}
-          <div className="mt-4 flex flex-col sm:flex-row sm:justify-between gap-2 text-sm text-muted-foreground">
-            <span>Last saved: Just now</span>
-            <span>Status: {status}</span>
-            <div className="flex gap-4"></div>
+          {/* Document stats and actions */}
+          <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+              <span>Last saved: Just now</span>
+              <span>Status: {status}</span>
+            </div>
+            
+            {/* Summarize Button */}
+            {roomId && (
+              <Sheet open={summaryOpen} onOpenChange={setSummaryOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    Summarize
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5" />
+                      Document Summary
+                    </SheetTitle>
+                    <SheetDescription>
+                      AI-generated summary of your document
+                    </SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="mt-6 space-y-4">
+                    {summaryLoading && (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    )}
+                    
+                    {summaryError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{summaryError}</AlertDescription>
+                      </Alert>
+                    )}
+                    
+                    {summary && !summaryLoading && (
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {summary}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!summaryLoading && !summaryError && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={fetchSummary}
+                        className="w-full"
+                      >
+                        Regenerate Summary
+                      </Button>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
       </div>
@@ -151,7 +246,7 @@ export const MarkdownEditor = () => {
       {/* Debug Panel - Side by Side */}
       {isDev && wsProvider && (
         <div className="w-80 flex-shrink-0">
-          <DebugPanel provider={wsProvider} />
+         <DebugPanel provider={wsProvider} /> 
         </div>
       )}
     </div>
