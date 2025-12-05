@@ -129,12 +129,12 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
           <LogOut className="w-4 h-4" />
           Logout
         </Button>
+        <div className="h-6 w-px bg-border mx-2 hidden sm:block" />
+        {/* <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} /> */}
         {/* curr user */}
         <div className="flex -space-x-2">
           {user && <UserBubble name={user.name} />}
         </div>
-        <div className="h-6 w-px bg-border mx-2 hidden sm:block" />
-        <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} />
       </div>
     </header>
   );
