@@ -12,6 +12,15 @@ interface HeaderProps {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/authcontext";
 import { ShareDocument } from "./addDoc";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+
 
 export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
   const { currentDocument: doc, collaborators } = useAppContext();
@@ -143,8 +152,31 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
         {/* <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} /> */}
         {/* curr user */}
         <div className="flex -space-x-2">
-          {user && <UserBubble name={user.name}  email={user.email} />}
+          {user && <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="cursor-pointer">
+              <UserBubble name={user.name} email={user.email} />
+            </div>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span className="font-medium">{user.name}</span>
+                <span className="text-xs text-muted-foreground">{user.email}</span>
+              </div>
+            </DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem onClick={logout}>
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        }
         </div>
+        
       </div>
     </header>
     </TooltipProvider>
