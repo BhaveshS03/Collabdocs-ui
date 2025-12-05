@@ -18,7 +18,7 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
   const handleShare = () => {
     setShareOpen(true);
   };
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const getInitials = (name: string) => {
     const words = name.trim().split(/\s+/);
     if (words.length === 1) {
@@ -47,6 +47,7 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
     "#a89984", // neutral
   ];
 
+  
   const getColorFromString = (str: string) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++)
@@ -63,6 +64,21 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
     return { background: color, text };
   };
 
+  function UserBubble({ name }: { name: string }) {
+    const { background } = getColorFromString(name);
+  
+    return (
+      <Avatar className="w-8 h-8 border-2 border-background">
+        <AvatarFallback
+          style={{ backgroundColor: background }}
+          className="text-xs"
+        >
+          {getInitials(name)}
+        </AvatarFallback>
+      </Avatar>
+    );
+  }
+  
   return (
     <header className="h-16 border-b border-border bg-gradient-subtle px-6 flex items-center justify-between">
       {/* Left: Menu button (mobile), Logo and document title */}
@@ -96,7 +112,12 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
         />
         <TitleInput doc={doc} />
       </div>
-
+      {/* Collaboration avatars */}
+      <div className="flex -space-x-2">
+        {collaborators.slice(0, 2).map((u) => (
+          <UserBubble key={u.id} name={u.name} />
+        ))}
+      </div>
       {/* Right: Actions and user */}
       <div className="flex items-center gap-1 sm:gap-3">
         <Button variant="ghost" size="sm" className="p-2" onClick={handleShare}>
@@ -108,29 +129,12 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
           <LogOut className="w-4 h-4" />
           Logout
         </Button>
-
+        {/* curr user */}
+        <div className="flex -space-x-2">
+          {user && <UserBubble name={user.name} />}
+        </div>
         <div className="h-6 w-px bg-border mx-2 hidden sm:block" />
         <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} />
-
-        {/* Collaboration avatars */}
-        <div className="flex -space-x-2">
-          {collaborators.slice(0, 2).map((user, index) => (
-            <Avatar
-              key={user.id}
-              className="w-8 h-8 border-2 border-background"
-            >
-              <AvatarFallback
-                style={{
-                  backgroundColor: getColorFromString(user.name).background,
-                  // color: getColorFromString(user.name).text,
-                }}
-                className="text-xs"
-              >
-                {getInitials(user.name)}
-              </AvatarFallback>
-            </Avatar>
-          ))}
-        </div>
       </div>
     </header>
   );

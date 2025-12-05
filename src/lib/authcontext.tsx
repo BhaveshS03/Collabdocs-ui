@@ -31,7 +31,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 axios.defaults.baseURL = "https://api.myzen.works";
-axios.defaults.headers.post["Content-Type"] = "application/json";
+axios.defaults.headers.common["Content-Type"] = "application/json";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
@@ -45,10 +45,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const token = localStorage.getItem("token");
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
     }
 
     checkAuth();
-  }, []);
+  }, [isAuthenticated]);
 
   const checkAuth = async () => {
     const token = localStorage.getItem("token");
