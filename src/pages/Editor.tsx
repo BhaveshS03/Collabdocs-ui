@@ -13,8 +13,8 @@ const Editor = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem("token");
   if (!token) {
-    window.location.href = "/";
-    localStorage.removeItem("userName");
+    // window.location.href = "/";
+    // localStorage.removeItem("userName");
   }
   async function authenticate() {
     try {
@@ -33,7 +33,7 @@ const Editor = () => {
       localStorage.removeItem("userName");
       localStorage.removeItem("token");
   
-      window.location.href = "/";
+      // window.location.href = "/";
     }
   }
   useEffect(() => {
