@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Share2, Download, Settings, Menu, LogOut } from "lucide-react";
 import TitleInput from "./titleip";
 import { useAppContext } from "@/lib/appcontext";
@@ -64,22 +65,31 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
     return { background: color, text };
   };
 
-  function UserBubble({ name }: { name: string }) {
+  function UserBubble({ name, email }: { name: string; email: string }) {
     const { background } = getColorFromString(name);
   
     return (
-      <Avatar className="w-8 h-8 border-2 border-background">
-        <AvatarFallback
-          style={{ backgroundColor: background }}
-          className="text-xs"
-        >
-          {getInitials(name)}
-        </AvatarFallback>
-      </Avatar>
+      <Tooltip>
+        <TooltipTrigger>
+        <Avatar className="w-8 h-8 border-2 border-background">
+          <AvatarFallback
+            style={{ backgroundColor: background }}
+            className="text-xs"
+          >
+            {getInitials(name)}
+          </AvatarFallback>
+        </Avatar>
+        </TooltipTrigger>
+        
+      <TooltipContent>
+        <p>{email}</p>
+      </TooltipContent>
+      </Tooltip>
     );
   }
   
   return (
+    <TooltipProvider>
     <header className="h-16 border-b border-border bg-gradient-subtle px-6 flex items-center justify-between">
       {/* Left: Menu button (mobile), Logo and document title */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
@@ -105,7 +115,7 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
 
         <div className="h-6 w-px bg-border mx-2 hidden sm:block" />
 
-        <input
+       <input
           type="text"
           defaultValue="Untitled Document"
           className="text-base sm:text-lg font-medium bg-transparent border-none outline-none focus:bg-accent rounded px-2 py-1 min-w-0 flex-1 max-w-[150px] sm:max-w-xs"
@@ -115,7 +125,7 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
       {/* Collaboration avatars */}
       <div className="flex -space-x-2">
         {collaborators.slice(0, 2).map((u) => (
-          <UserBubble key={u.id} name={u.name} />
+          <UserBubble key={u.id} name={u.name}  email={u.email} />
         ))}
       </div>
       {/* Right: Actions and user */}
@@ -133,9 +143,10 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
         {/* <ShareDocument open={shareOpen} onOpenChange={setShareOpen} doc={doc} /> */}
         {/* curr user */}
         <div className="flex -space-x-2">
-          {user && <UserBubble name={user.name} />}
+          {user && <UserBubble name={user.name}  email={user.email} />}
         </div>
       </div>
     </header>
+    </TooltipProvider>
   );
 }

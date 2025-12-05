@@ -21,9 +21,9 @@ interface AppContext {
   loggedIn: boolean;
   setLoggedIn: (loggedIn: boolean) => void;
 
-  collaborators: Array<{ id: number; name: string }>;
+  collaborators: Array<{ id: number; name: string, email:string }>;
   setCollaborators: (
-    collaborators: Array<{ id: number; name: string }>,
+    collaborators: Array<{ id: number; name: string, email:string }>,
   ) => void;
 }
 
@@ -35,7 +35,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<string>("Guest");
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [collaborators, setCollaborators] = useState<
-    Array<{ id: number; name: string }>
+    Array<{ id: number; name: string; email: string }>
   >([]);
 
   return (

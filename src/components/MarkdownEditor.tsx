@@ -72,6 +72,7 @@ export const MarkdownEditor = () => {
           users.push({
             id: clientId,
             name: state.user.name,
+            email: state.user.email
           });
         }
       });
