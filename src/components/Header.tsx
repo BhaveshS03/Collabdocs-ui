@@ -125,7 +125,7 @@ export function Header({ onMenuClick, showMenuButton }: HeaderProps) {
       {/* Collaboration avatars */}
       <div className="flex -space-x-2">
         {collaborators.slice(0, 2).map((u) => (
-          <UserBubble key={u.id} name={u.name}  email={u.email} />
+          <UserBubble key={u.id} name={u.name}  email={u.name} />
         ))}
       </div>
       {/* Right: Actions and user */}
