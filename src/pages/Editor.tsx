@@ -33,7 +33,7 @@ const Editor = () => {
       localStorage.removeItem("userName");
       localStorage.removeItem("token");
   
-      // window.location.href = "/";
+      window.location.href = "/";
     }
   }
   useEffect(() => {
