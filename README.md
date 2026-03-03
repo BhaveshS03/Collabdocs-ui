@@ -8,7 +8,7 @@ A collaborative note-taking and document editing application.
 
 ## Project Structure
 
-- `notes-app-backend/`: The backend server powered by Bun and Express.
+- `notes-app-backend/`: The backend server powered by Bun and Express. [Backend](https://github.com/BhaveshS03/notes-app-backend)
 - `Collabdocs-ui/`: The frontend application built with Vite, React, and Tailwind CSS.
 
 ## Prerequisites
