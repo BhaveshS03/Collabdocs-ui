@@ -85,6 +85,5 @@ bun dev
 
 ## Technical Stack
 
-- **Backend**: Bun, Express, Mongoose, Passport (Google OAuth), WebSocket (Yjs for collaboration).
-- **Frontend**: Vite, React, Shadcn/UI, Tailwind CSS, TanStack Query, Axios, Yjs.
-- **Real-time**: Yjs for collaborative editing, Y-WebSocket for synchronization.
+- **Backend**: Bun, Express, Mongoose, Passport (Google OAuth), WebSocket (for collaboration).
+- **Frontend**: Vite, React, Tailwind CSS, TanStack Query, Axios
